@@ -27,6 +27,45 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────
+# WACHTWOORDBEVEILIGING
+# ─────────────────────────────────────────────
+def check_wachtwoord() -> bool:
+    """
+    Toont een inlogscherm. Wachtwoord staat in Streamlit Secrets:
+      [auth]
+      wachtwoord = "jouw-wachtwoord"
+    Lokaal: maak .streamlit/secrets.toml aan met bovenstaande inhoud.
+    """
+    # Haal wachtwoord op uit secrets (of gebruik fallback voor lokaal testen)
+    try:
+        correct_wachtwoord = st.secrets["auth"]["wachtwoord"]
+    except Exception:
+        correct_wachtwoord = "demo1234"  # Lokale fallback
+
+    if "ingelogd" not in st.session_state:
+        st.session_state.ingelogd = False
+
+    if st.session_state.ingelogd:
+        return True
+
+    # Inlogscherm
+    st.markdown("## 🔐 Inloggen")
+    st.markdown("Dit dashboard is beveiligd. Voer het wachtwoord in om verder te gaan.")
+    wachtwoord_input = st.text_input("Wachtwoord", type="password", placeholder="Voer wachtwoord in")
+
+    if st.button("Inloggen", use_container_width=False):
+        if wachtwoord_input == correct_wachtwoord:
+            st.session_state.ingelogd = True
+            st.rerun()
+        else:
+            st.error("❌ Onjuist wachtwoord. Probeer opnieuw.")
+
+    st.stop()  # Voorkomt dat de rest van de app laadt
+    return False
+
+check_wachtwoord()
+
+# ─────────────────────────────────────────────
 # STYLING
 # ─────────────────────────────────────────────
 st.markdown("""
@@ -94,27 +133,27 @@ st.markdown("""
 def laad_demo_medewerkers() -> pd.DataFrame:
     """Retourneert een DataFrame met voorbeeldmedewerkers."""
     return pd.DataFrame([
-        {"naam": "Anna de Vries",      "afdeling": "Tech",       "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 5200, "startdatum": "2022-01-01", "einddatum": None},
-        {"naam": "Bob Janssen",        "afdeling": "Tech",       "uren_per_week": 32, "fte": 0.8, "bruto_maandsalaris": 4100, "startdatum": "2022-03-01", "einddatum": None},
-        {"naam": "Carla Smit",         "afdeling": "Sales",      "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 4500, "startdatum": "2021-06-01", "einddatum": None},
-        {"naam": "David Mulder",       "afdeling": "Sales",      "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 4800, "startdatum": "2022-09-01", "einddatum": None},
-        {"naam": "Eva Bakker",         "afdeling": "HR",         "uren_per_week": 24, "fte": 0.6, "bruto_maandsalaris": 2700, "startdatum": "2023-01-01", "einddatum": None},
-        {"naam": "Frank Peters",       "afdeling": "Finance",    "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 5500, "startdatum": "2021-01-01", "einddatum": None},
-        {"naam": "Grace Willems",      "afdeling": "Tech",       "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 5800, "startdatum": "2023-04-01", "einddatum": None},
-        {"naam": "Hans Vogel",         "afdeling": "Sales",      "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 4200, "startdatum": "2023-07-01", "einddatum": "2024-06-30"},
-        {"naam": "Iris Laan",          "afdeling": "Marketing",  "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 4600, "startdatum": "2022-11-01", "einddatum": None},
-        {"naam": "Jan Kok",            "afdeling": "Marketing",  "uren_per_week": 32, "fte": 0.8, "bruto_maandsalaris": 3600, "startdatum": "2024-01-01", "einddatum": None},
+        {"naam": "Developer-01",       "afdeling": "Tech",       "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 5200, "startdatum": "2022-01-01", "einddatum": None},
+        {"naam": "Developer-02",       "afdeling": "Tech",       "uren_per_week": 32, "fte": 0.8, "bruto_maandsalaris": 4100, "startdatum": "2022-03-01", "einddatum": None},
+        {"naam": "Accountmanager-01",  "afdeling": "Sales",      "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 4500, "startdatum": "2021-06-01", "einddatum": None},
+        {"naam": "Accountmanager-02",  "afdeling": "Sales",      "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 4800, "startdatum": "2022-09-01", "einddatum": None},
+        {"naam": "HR-medewerker-01",   "afdeling": "HR",         "uren_per_week": 24, "fte": 0.6, "bruto_maandsalaris": 2700, "startdatum": "2023-01-01", "einddatum": None},
+        {"naam": "Controller-01",      "afdeling": "Finance",    "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 5500, "startdatum": "2021-01-01", "einddatum": None},
+        {"naam": "Developer-03",       "afdeling": "Tech",       "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 5800, "startdatum": "2023-04-01", "einddatum": None},
+        {"naam": "Accountmanager-03",  "afdeling": "Sales",      "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 4200, "startdatum": "2023-07-01", "einddatum": "2024-06-30"},
+        {"naam": "Marketeer-01",       "afdeling": "Marketing",  "uren_per_week": 40, "fte": 1.0, "bruto_maandsalaris": 4600, "startdatum": "2022-11-01", "einddatum": None},
+        {"naam": "Marketeer-02",       "afdeling": "Marketing",  "uren_per_week": 32, "fte": 0.8, "bruto_maandsalaris": 3600, "startdatum": "2024-01-01", "einddatum": None},
     ])
 
 
 def laad_demo_mutaties() -> pd.DataFrame:
     """Retourneert mutaties (salarisverhogingen, uren-wijzigingen, uitdienst)."""
     return pd.DataFrame([
-        {"datum": "2024-01-01", "medewerker": "Anna de Vries",  "type": "salaris_wijziging", "nieuwe_waarde": 5500},
-        {"datum": "2024-04-01", "medewerker": "Bob Janssen",    "type": "uren_wijziging",    "nieuwe_waarde": 40},
-        {"datum": "2024-04-01", "medewerker": "Bob Janssen",    "type": "salaris_wijziging", "nieuwe_waarde": 5000},
-        {"datum": "2024-07-01", "medewerker": "Carla Smit",     "type": "salaris_wijziging", "nieuwe_waarde": 4800},
-        {"datum": "2024-06-30", "medewerker": "Hans Vogel",     "type": "uitdienst",         "nieuwe_waarde": 0},
+        {"datum": "2024-01-01", "medewerker": "Developer-01",      "type": "salaris_wijziging", "nieuwe_waarde": 5500},
+        {"datum": "2024-04-01", "medewerker": "Developer-02",      "type": "uren_wijziging",    "nieuwe_waarde": 40},
+        {"datum": "2024-04-01", "medewerker": "Developer-02",      "type": "salaris_wijziging", "nieuwe_waarde": 5000},
+        {"datum": "2024-07-01", "medewerker": "Accountmanager-01", "type": "salaris_wijziging", "nieuwe_waarde": 4800},
+        {"datum": "2024-06-30", "medewerker": "Accountmanager-03", "type": "uitdienst",         "nieuwe_waarde": 0},
     ])
 
 
